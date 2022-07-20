@@ -265,8 +265,9 @@ class _registorState extends State<registor> with InputValidationMixin{
                                                   readOnly: true,  //set it true, so that user will not able to edit text
                                                   onTap: () async {
                                                     DateTime? pickedDate = await showDatePicker(
-                                                        context: context, initialDate: DateTime.now(),
-                                                        firstDate: DateTime(1900), //DateTime.now() - not to allow to choose before today.
+                                                        context: context, 
+                                                        initialDate: DateTime.now(),
+                                                        firstDate: DateTime(1900),
                                                         lastDate: DateTime(2101)
                                                     );
                                                     if(pickedDate != null ){
