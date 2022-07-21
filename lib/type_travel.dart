@@ -4,23 +4,21 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_travel_planning/global/color.dart';
-import 'package:flutter_travel_planning/travel_plans.dart';
+import 'package:flutter_travel_planning/travel_thailand.dart';
 import 'package:flutter_travel_planning/travel_world.dart';
-import 'package:flutter_travel_planning/type_travel.dart';
 
+import 'checklist.dart';
 
-class home extends StatefulWidget {
+class type_travel extends StatefulWidget {
   static const routeName = '/home';
   @override
-  _homeState createState() => _homeState();
+  _type_travelState createState() => _type_travelState();
 }
 
-class _homeState extends State<home> {
+class _type_travelState extends State<type_travel> {
   List<String> titleList = [
-    'Travel plans',
-    'Visited',
-    'Manage account',
-    'Reccommend'
+    'Travel Aboard',
+    'Travel in Thailand',
   ];
 
   var pdfPrivacyPolicy = 'assets/pdf/privacypolicy.pdf';
@@ -38,14 +36,6 @@ class _homeState extends State<home> {
               Column(
                 children: [
                   const SizedBox(height: 30),
-                  const Text(
-                    'Menu',
-                    style: TextStyle(
-                      fontSize: 36,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "SukhumvitSet", ),
-                  ),
                   const SizedBox(height: 30),
                   Expanded(
                     flex: 10,
@@ -56,30 +46,24 @@ class _homeState extends State<home> {
                           borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(15.0),
                               bottomRight: Radius.circular(15.0))),
-                      child: GridView.builder(
+                      child: ListView.builder(
                           itemCount: titleList.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 4.0,
-                              mainAxisSpacing: 4.0),
                           itemBuilder: (BuildContext context, int index) {
                             return GestureDetector(
                               onTap: () {
-                                if(index==0){
-                                  _pushPageTravelPlaning(context,false);
-                                }
+                                _pushPageTravel(context,false,index == 0 ? "" : "th");
+                                // _pushPageChecklist(context,false,index == 0 ? "" : "th");
                               },
                               child:
                               Container(alignment: Alignment.center,
-                              padding: EdgeInsets.all(5),
+                              padding: EdgeInsets.only(top:50,bottom:50),
                             margin: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                             color: AppColors.color_bg_grey_text,
-                            borderRadius: BorderRadius.all(Radius.circular(25))),
+                            ),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
-                                        child: Text(titleList[index],style: TextStyle(fontSize: 18),
-                                          textAlign: TextAlign.center,),
+                                        child: Text(titleList[index],style: TextStyle(fontSize: 18),),
                                       )
                               )
                             );
@@ -94,13 +78,22 @@ class _homeState extends State<home> {
       ),
     );
   }
-  _pushPageTravelPlaning(BuildContext context, bool isHorizontalNavigation) {
-    Navigator.of(context, rootNavigator: !isHorizontalNavigation).push(
-      _buildAdaptivePageRoute(
-        builder: (context) => travel_plans(),
-        fullscreenDialog: !isHorizontalNavigation,
-      ),
-    ).then((value) {});
+  _pushPageTravel(BuildContext context, bool isHorizontalNavigation,String typeTravel) {
+    if(typeTravel == "th"){
+      Navigator.of(context, rootNavigator: !isHorizontalNavigation).push(
+        _buildAdaptivePageRoute(
+          builder: (context) => travel_thailand("",""),
+          fullscreenDialog: !isHorizontalNavigation,
+        ),
+      ).then((value) {});
+    }else{
+      Navigator.of(context, rootNavigator: !isHorizontalNavigation).push(
+        _buildAdaptivePageRoute(
+          builder: (context) => travel_world("",""),
+          fullscreenDialog: !isHorizontalNavigation,
+        ),
+      ).then((value) {});
+    }
   }
   PageRoute<T> _buildAdaptivePageRoute<T>({
     required WidgetBuilder builder,
@@ -115,5 +108,4 @@ class _homeState extends State<home> {
         builder: builder,
         fullscreenDialog: fullscreenDialog,
       );
-
 }

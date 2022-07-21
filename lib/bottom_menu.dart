@@ -1,11 +1,16 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_travel_planning/global/color.dart';
+import 'package:flutter_travel_planning/type_travel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'checklist.dart';
 import 'login.dart';
 import 'global/url.dart';
 import 'home.dart';
+//import 'notifcation.dart';
 
 class bottom_menu extends StatefulWidget {
   var _currentIndex = 0;
@@ -18,19 +23,44 @@ class bottom_menu extends StatefulWidget {
   }
 }
 
-
 class _bottom_menuState extends State<bottom_menu> {
   int final_index = 0;
 
   _bottom_menuState(currentIndex);
+  final DatabaseReference _db = FirebaseDatabase.instance.ref();
+  late Query ref;
+  late StreamSubscription<DatabaseEvent> _defaultiotSubscription;
 @override
   void initState() {
   super.initState();
     final_index = widget._currentIndex;
+    getName();
+  }
+  getName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    AppUrl.UserID = prefs.get('user_id').toString();
+    if(AppUrl.UserID != "null" && AppUrl.UserID != ""){
+      ref = _db.child("Users")
+          .orderByChild("user_id")
+          .equalTo(AppUrl.UserID);
+      _defaultiotSubscription =
+          ref.onValue.listen(
+                  (DatabaseEvent event) {
+                Map<String, dynamic>.from(
+                    event.snapshot
+                        .value as dynamic)
+                    .forEach((key,
+                    value) async {
+                      setState(() {
+                        AppUrl.Username = value['name'];
+                      });
+                });
+              });
+    }
   }
   final screens = [
     home(),
-    checklist(),
+    type_travel(),
   ];
   _changeIndex(int index) {
     setState(() {
@@ -45,7 +75,6 @@ class _bottom_menuState extends State<bottom_menu> {
       appBar: AppBar(
         title: const Text("Travel Planning",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold)),
         backgroundColor: AppColors.colorMain,
-        //start head
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -53,7 +82,6 @@ class _bottom_menuState extends State<bottom_menu> {
               color: Colors.black,
             ),
             onPressed: () {
-              // do something
             },
           ),
           Column(
@@ -61,7 +89,7 @@ class _bottom_menuState extends State<bottom_menu> {
               SizedBox(
                 height: 5,
               ),
-              Text("") ,
+              Text(AppUrl.Username),
               Container(
                 alignment: Alignment.bottomCenter,
                 margin: EdgeInsets.only(top: 5,right: 5),
@@ -96,7 +124,6 @@ class _bottom_menuState extends State<bottom_menu> {
             ],
           ),
         ],
-        //end head
           leadingWidth: final_index !=0 ? 70 :0,
           leading:final_index !=0 ? IconButton(
             icon: Icon(Icons.arrow_back_ios,color: Colors.black,),
@@ -123,10 +150,10 @@ class _bottom_menuState extends State<bottom_menu> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.menu),
               label: "Menu",
-              backgroundColor: Colors.black),
-          BottomNavigationBarItem(icon: Icon(Icons.backpack),
+              backgroundColor: Colors.green),
+          BottomNavigationBarItem(icon: Icon(Icons.pie_chart),
               label: "Checklist",
-              backgroundColor: Colors.black)
+              backgroundColor: Colors.red)
         ],
       ),
     );
